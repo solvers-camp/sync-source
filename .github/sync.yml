@@ -1,0 +1,9 @@
+solvers-camp/sync-destination:
+  - source: folder1/
+    dest: folder1/
+  - source: folder2/
+    dest: folder2/
+  - source: folder3/
+    dest: folder3/
+  - source: README.md
+    dest: README.md
