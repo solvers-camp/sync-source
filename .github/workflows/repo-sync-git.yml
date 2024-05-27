@@ -5,7 +5,7 @@ on:
   #     - main
   workflow_dispatch:
     inputs:
-        GH_PAT:
+        PAT:
             type: string
             description: Github PAT
             required: true
@@ -18,20 +18,35 @@ jobs:
       - name: Checkout source repository
         uses: actions/checkout@v2
 
+      # - name: Push to destination repository
+      #   run: |
+      #     git config --global user.email "kumvijaya@gmail.com"
+      #     git config --global user.name "kumvijaya"
+      #     git clone https://${{ env.DESTINATION_ORG }}:${{ env.GITHUB_TOKEN }}@github.com/${{ env.DESTINATION_ORG }}/${{ env.DESTINATION_REPO }}.git -b ${{ env.BRANCH }}
+      #     cd ${{ env.DESTINATION_REPO }}
+      #     git remote add ${{ env.SOURCE_REPO }} https://${{ env.SOURCE_ORG }}:${{ env.GITHUB_TOKEN }}@github.com/${{ env.SOURCE_ORG }}/${{ env.SOURCE_REPO }}.git
+      #     git remote update
+      #     git merge ${{ env.SOURCE_REPO }}/${{ env.BRANCH }}
+      #     git push origin ${{ env.BRANCH }}
+      #   env:
+      #     GITHUB_TOKEN: ${{ inputs.GH_PAT }}
+      #     SOURCE_REPO: ${{ github.event.repository.name }}
+      #     SOURCE_ORG: solvers-camp
+      #     DESTINATION_ORG: solvers-camp
+      #     DESTINATION_REPO: sync-destination
+      #     BRANCH: main
+
       - name: Push to destination repository
         run: |
           git config --global user.email "kumvijaya@gmail.com"
           git config --global user.name "kumvijaya"
-          git clone https://${{ env.DESTINATION_ORG }}:${{ env.GITHUB_TOKEN }}@github.com/${{ env.DESTINATION_ORG }}/${{ env.DESTINATION_REPO }}.git -b ${{ env.BRANCH }}
-          cd ${{ env.DESTINATION_REPO }}
-          git remote add ${{ env.SOURCE_REPO }} https://${{ env.SOURCE_ORG }}:${{ env.GITHUB_TOKEN }}@github.com/${{ env.SOURCE_ORG }}/${{ env.SOURCE_REPO }}.git
+          git clone https://${{ env.ORG_NAME }}:${{ inputs.PAT }}@github.com/${{ env.ORG_NAME }}/sync-destination.git
+          cd sync-destination
+          git remote add ${{ env.ORIGINAL_REPO_NAME }} https://${{ env.ORG_NAME }}:${{ secrets.PAT }}@github.com/${{ env.ORG_NAME }}/${{ env.ORIGINAL_REPO_NAME }}.git
           git remote update
-          git merge ${{ env.SOURCE_REPO }}/${{ env.BRANCH }}
-          git push origin ${{ env.BRANCH }}
+          git merge ${{ env.ORIGINAL_REPO_NAME }}/main
+          git push origin main
         env:
-          GITHUB_TOKEN: ${{ inputs.GH_PAT }}
-          SOURCE_REPO: ${{ github.event.repository.name }}
-          SOURCE_ORG: solvers-camp
-          DESTINATION_ORG: solvers-camp
-          DESTINATION_REPO: sync-destination
-          BRANCH: main
+          GITHUB_TOKEN: ${{ inputs.PAT }}
+          ORIGINAL_REPO_NAME: ${{ github.event.repository.name }}
+          ORG_NAME: solvers-camp
