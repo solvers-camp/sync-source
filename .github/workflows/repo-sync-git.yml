@@ -1,0 +1,37 @@
+name: Sync Repo Branch
+on:
+  # push:
+  #   branches:
+  #     - main
+  workflow_dispatch:
+    inputs:
+        GH_PAT:
+            type: string
+            description: Github PAT
+            required: true
+      
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source repository
+        uses: actions/checkout@v2
+
+      - name: Push to destination repository
+        run: |
+          git config --global user.email "kumvijaya@gmail.com"
+          git config --global user.name "kumvijaya"
+          git clone https://${{ env.DESTINATION_ORG }}:${{ env.GITHUB_TOKEN }}@github.com/${{ env.DESTINATION_ORG }}/${{ env.DESTINATION_REPO }}.git -b ${{ env.BRANCH }}
+          cd ${{ env.DESTINATION_REPO }}
+          git remote add ${{ env.SOURCE_REPO }} https://${{ env.SOURCE_ORG }}:${{ env.GITHUB_TOKEN }}@github.com/${{ env.SOURCE_ORG }}/${{ env.SOURCE_REPO }}.git
+          git remote update
+          git merge ${{ env.SOURCE_REPO }}/${{ env.BRANCH }}
+          git push origin ${{ env.BRANCH }}
+        env:
+          GITHUB_TOKEN: ${{ inputs.GH_PAT }}
+          SOURCE_REPO: ${{ github.event.repository.name }}
+          SOURCE_ORG: solvers-camp
+          DESTINATION_ORG: solvers-camp
+          DESTINATION_REPO: sync-destination
+          BRANCH: main
